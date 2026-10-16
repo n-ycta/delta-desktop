@@ -14,3 +14,5 @@ Download the AppImage or per-user NSIS EXE and verify SHA256SUMS. One-command la
 Release gates include native startup, profile persistence, private runtime and installing/running headless MCP without Web on CI. Shared UI routes are also exercised against a real embedded Core through a browser harness. CI is not a physical-device test.
 
 New profiles bind to loopback; pairing does not provide NAT traversal. Independent signed UI activation and native binary self-update are not enabled. Unsupported operations and mobile-only restrictions are not simulated. See README for boundaries.
+
+Shared UI 0.1.5 adds durable display name, nickname and avatar settings and recovery phrases hidden by default with copy and native Markdown export. Portable static apps use isolated per-app origins with no owner credential access. This release passed installed Linux and Windows startup acceptance; Media background playback and cross-device library synchronization are not claimed.
