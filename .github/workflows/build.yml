@@ -1,5 +1,8 @@
 name: Build native desktop preview
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -16,6 +19,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
       - uses: dtolnay/rust-toolchain@stable
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf
