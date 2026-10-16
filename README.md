@@ -1,21 +1,29 @@
-# Delta Desktop — experimental P0 host
+# Delta Desktop
 
-The Rust core is embedded in the application. This is **not** a link to a remote Web panel, and Node.js/npm is not needed on the user's device. Screens are imported from the same immutable `delta-ui` package used by Web; there is no copied frontend.
+Native Windows x64 and Linux x86_64 application with an embedded Rust Core and the shared, immutable-pinned `delta-ui`. It does not load a remote Web panel and does not require the Web plugin or a system Node.js installation.
 
-## Available in this first development slice
+## Application
 
-- Persistent local node identity, core capability/component discovery and the shared native UI.
-- Versioned, size-bounded root-document IPC; owner credentials are not sent to JavaScript.
-- Mobile assembly excludes desktop process execution, npm package installation and host telemetry. Unsupported integrations are not simulated.
-- Desktop: reuse `DELTA_HOME` / `~/.delta`, verify node identity before attaching to an existing running profile, otherwise embed the same profile. Exclusive host lease prevents duplicate GUI runtimes. Closing the window hides it to the tray; Exit node is explicit.
+- Full shared interface: nodes, plugin catalog/settings/actions/tables, dashboards, access and contracts.
+- MCP, updates, SSH provisioning and observability use independent service plugins over the capability API. Select their node explicitly in Settings → Connection. Missing dependencies stay unavailable.
+- Owner credentials remain in Rust. The privileged document uses bounded IPC; remote plugin HTML frames remain disabled.
+- A checksum-verified private Node/npm runtime is bundled for desktop plugins. Existing runtime files are not silently overwritten.
+- Reuses `DELTA_HOME`, otherwise `~/.delta` on Linux and `%LOCALAPPDATA%\Delta` on Windows. A running compatible Core is attached only after identity verification. The profile lease prevents duplicate GUI ownership.
+- Closing the window hides it to the tray. Exit stops an embedded node, not an attached external Core. Login startup is optional.
+- QR invitation images, `delta://pair` links, explicit incoming administrative trust, native export/share, external browser links and opt-in system notifications.
 
-## Not ready / acceptance gates
+## Installation
 
-Full parity with Web's MCP/SSH/update/plugin-projection services, QR pairing UI, platform file/share/notification adapters, Keystore-backed trust secrets, background Android service, independent signed UI updates, workspaces, signed stable installers and physical-device reboot/sleep checks are **not complete**. Plugin HTML frames are disabled by CSP until isolation is integrated and tested. Do not mark ANDROID-01/DESKTOP-01/P0/P1 complete from this preview.
+Download the AppImage or per-user NSIS EXE from GitHub Releases and verify `SHA256SUMS`. The Linux `install.sh` and Windows `install.ps1` scripts are pinned to the release version and verify the downloaded binary. Inspect scripts before executing them. No administrator rights are required by these scripts.
 
-Android uses application-private persistent storage and is currently foreground-only: Android may stop it. Debug APK signing from CI is not a stable update channel; keep production profiles out of debug builds. No 24/7 promise.
+The EXE is **not Authenticode-signed**; Windows may display SmartScreen. Linux requires a desktop session, WebKitGTK-compatible distribution and FUSE 2 for AppImage; `APPIMAGE_EXTRACT_AND_RUN=1` is an alternative where FUSE is unavailable.
+
+## Networking and limits
+
+A newly embedded Core binds to loopback. Pairing allows this app to call a reachable remote Core; it does not create a VPN, open firewall ports or make loopback reachable by other devices. For bidirectional inbound access, run/configure a normal Core profile with an appropriate listener and advertised address over HTTPS or a trusted private network.
+
+Independent signed UI activation/rollback and application binary self-update are not enabled. UI updates ship with native app releases. Unsupported role reassignment and live connection editing are reported explicitly, not simulated. There is no physical Windows/Linux machine acceptance claim from CI alone.
 
 ## Build
 
-`npm ci && npm run build:ui`. Native build additionally requires Rust and the platform Tauri prerequisites. Desktop: `npx tauri build --bundles appimage` (Linux), `--bundles nsis` (Windows). Android: `npx tauri android init --ci`, then `npx tauri android build --debug --apk --target aarch64 --ci` with Android SDK/NDK installed.
-
+Install Rust, Node 24 and platform Tauri prerequisites. Run `npm ci --ignore-scripts`, `python scripts/prepare-runtime.py`, then `npx tauri build --bundles appimage` on Linux or `--bundles nsis` on Windows. Source revisions are fixed in `package-lock.json` and `src-tauri/Cargo.lock`.
