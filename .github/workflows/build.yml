@@ -1,4 +1,4 @@
-name: Build native desktop preview
+name: Native desktop
 on:
   push:
     paths-ignore: ['**/*.md']
@@ -17,18 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri -> target
+        with: {node-version: '24'}
       - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: {workspaces: 'src-tauri -> target'}
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf
       - run: npm ci --ignore-scripts
-      - run: npm run build:ui
+      - run: python scripts/prepare-runtime.py
       - run: npx tauri build --bundles ${{ matrix.bundle }}
       - uses: actions/upload-artifact@v4
         with:
-          name: delta-desktop-${{ matrix.artifact }}-preview
+          name: delta-desktop-${{ matrix.artifact }}
           path: src-tauri/target/release/bundle
