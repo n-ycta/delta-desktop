@@ -37,7 +37,18 @@ jobs:
           dbus-run-session -- xvfb-run -a python3 tests/native-smoke.py src-tauri/target/release/bundle/appimage/squashfs-root/AppRun
       - name: Native Windows acceptance
         if: runner.os == 'Windows'
-        run: python tests/native-smoke.py src-tauri/target/release/delta-desktop.exe
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $Install = Join-Path $env:RUNNER_TEMP 'Delta-Installed'
+          $Setup = (Get-ChildItem 'src-tauri/target/release/bundle/nsis/*-setup.exe' | Select-Object -First 1).FullName
+          $Process = Start-Process -FilePath $Setup -ArgumentList "/S /D=$Install" -Wait -PassThru
+          if ($Process.ExitCode -ne 0) { throw "NSIS failed: $($Process.ExitCode)" }
+          python tests/native-smoke.py "$Install/delta-desktop.exe"
+          if ($LASTEXITCODE -ne 0) { throw 'Installed Windows application acceptance failed' }
+          $Protocol = (Get-Item 'HKCU:\Software\Classes\delta\shell\open\command').GetValue('')
+          if ($Protocol -notlike "*$Install*delta-desktop.exe*") { throw 'Pairing protocol registration mismatch' }
+          Start-Process -FilePath "$Install/uninstall.exe" -ArgumentList '/S' -Wait
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -46,7 +57,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: delta-desktop-${{ matrix.artifact }}
-          path: src-tauri/target/release/bundle
+          path: |
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*-setup.exe
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: desktop
