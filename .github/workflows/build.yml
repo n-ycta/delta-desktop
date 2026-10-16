@@ -22,11 +22,50 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with: {workspaces: 'src-tauri -> target'}
       - if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf xvfb dbus-x11 imagemagick
       - run: npm ci --ignore-scripts
       - run: python scripts/prepare-runtime.py
       - run: npx tauri build --bundles ${{ matrix.bundle }}
+      - name: Native Linux acceptance
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          chmod +x src-tauri/target/release/bundle/appimage/*.AppImage
+          cd src-tauri/target/release/bundle/appimage
+          ./"$(basename "$(find . -maxdepth 1 -name '*.AppImage' | head -1)")" --appimage-extract
+          cd "$GITHUB_WORKSPACE"
+          dbus-run-session -- xvfb-run -a python3 tests/native-smoke.py src-tauri/target/release/bundle/appimage/squashfs-root/AppRun
+      - name: Native Windows acceptance
+        if: runner.os == 'Windows'
+        run: python tests/native-smoke.py src-tauri/target/release/delta-desktop.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-acceptance-${{ matrix.artifact }}
+          path: acceptance
       - uses: actions/upload-artifact@v4
         with:
           name: delta-desktop-${{ matrix.artifact }}
           path: src-tauri/target/release/bundle
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: desktop
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: delta-desktop-*
+          path: artifacts
+      - run: |
+          mkdir release
+          cp "$(find artifacts -name '*.AppImage' | head -1)" release/Delta-Desktop-linux-x86_64.AppImage
+          cp "$(find artifacts -name '*-setup.exe' | head -1)" release/Delta-Desktop-windows-x86_64.exe
+          cp install.sh install.ps1 release/
+          cd release && sha256sum * > SHA256SUMS
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "Delta Desktop ${GITHUB_REF_NAME#v}" --notes-file RELEASE.md
+          gh release upload "$GITHUB_REF_NAME" release/*
