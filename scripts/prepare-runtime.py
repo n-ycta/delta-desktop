@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory() as d:
  if ext=='.zip':
   with zipfile.ZipFile(archive) as z:z.extractall(d)
  else:
-  with tarfile.open(archive) as t:t.extractall(d,filter='data')
+  with tarfile.open(archive) as t:t.extractall(d,members=[m for m in t.getmembers() if m.isfile() or m.isdir()],filter='data')
  source=Path(d)/name;target=Path('runtime');shutil.rmtree(target,ignore_errors=True);target.mkdir()
  if kind.startswith('win'):
   shutil.copy2(source/'node.exe',target/'node.exe');shutil.copytree(source/'node_modules/npm',target/'node_modules/npm')
