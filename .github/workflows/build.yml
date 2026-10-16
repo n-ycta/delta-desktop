@@ -24,6 +24,7 @@ jobs:
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf xvfb dbus-x11 imagemagick
       - run: npm ci --ignore-scripts
+      - run: python tests/icon-resources.py
       - run: python scripts/prepare-runtime.py
       - run: npx tauri build --bundles ${{ matrix.bundle }}
       - name: Native Linux acceptance
@@ -75,6 +76,7 @@ jobs:
           mkdir release
           cp "$(find artifacts -name '*.AppImage' | head -1)" release/Delta-Desktop-linux-x86_64.AppImage
           cp "$(find artifacts -name '*-setup.exe' | head -1)" release/Delta-Desktop-windows-x86_64.exe
+          cp branding/delta-logo.svg release/delta-logo.svg
           cd release && sha256sum * > SHA256SUMS
       - env:
           GH_TOKEN: ${{ github.token }}

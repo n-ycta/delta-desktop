@@ -931,7 +931,7 @@ dependencies = [
 
 [[package]]
 name = "delta-desktop"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "delta-native-host",
  "tauri",
@@ -953,7 +953,7 @@ dependencies = [
 [[package]]
 name = "delta-native-host"
 version = "0.1.1"
-source = "git+https://github.com/n-ycta/delta-ui?rev=1609047e00cd638adf754c2f830a9cd1e18b6bb8#1609047e00cd638adf754c2f830a9cd1e18b6bb8"
+source = "git+https://github.com/n-ycta/delta-ui?rev=6de29d627429486c22fa8d66496cf3dea074958c#6de29d627429486c22fa8d66496cf3dea074958c"
 dependencies = [
  "delta-host-runtime",
  "jni",

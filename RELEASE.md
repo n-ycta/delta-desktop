@@ -1,5 +1,8 @@
 Native Windows x64 and Linux x86_64 clients with embedded Rust Core, a shared immutable-pinned Delta UI and bundled private Node/npm for plugins. No Web plugin or system Node installation is required.
 
+- Internal same-origin navigation remains inside the bundled application; real external HTTP(S) links use the OS browser.
+- Explicit personal-key onboarding and Phosphor interface icons from shared Delta UI.
+- Canonical SVG brand with platform PNG/ICO resources and a checksummed Linux desktop icon.
 - Full shared management UI over credential-private IPC.
 - Tray lifecycle, optional login startup and system notifications.
 - QR image pairing, explicit service-node selection, native JSON exports and external browser links.
