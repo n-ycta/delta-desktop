@@ -1,3 +1,12 @@
+## Version 0.1.3
+
+- Pin shared UI 0.2.0: full Console, composable workbench, four themes and
+  templates, responsive dock, compact hideable host controls, editable overview.
+- Bundle verified Media 0.1.0-alpha.3 with radio presets and reusable shared
+  application surfaces. Existing libraries and workspace layouts survive asset updates.
+- Retain host permission boundaries; composition never grants plugin permissions.
+- Native background audio and cross-device media-library sync are not claimed.
+
 Native Windows x64 and Linux x86_64 clients with embedded Rust Core, a shared immutable-pinned Delta UI and bundled private Node/npm for plugins. No Web plugin or system Node installation is required.
 
 - Internal same-origin navigation remains inside the bundled application; real external HTTP(S) links use the OS browser.
@@ -15,4 +24,4 @@ Release gates include native startup, profile persistence, private runtime and i
 
 New profiles bind to loopback; pairing does not provide NAT traversal. Independent signed UI activation and native binary self-update are not enabled. Unsupported operations and mobile-only restrictions are not simulated. See README for boundaries.
 
-Shared UI 0.1.5 adds durable display name, nickname and avatar settings and recovery phrases hidden by default with copy and native Markdown export. Portable static apps use isolated per-app origins with no owner credential access. This release passed installed Linux and Windows startup acceptance; Media background playback and cross-device library synchronization are not claimed.
+Shared UI 0.2.0 adds durable display name, nickname and avatar settings and recovery phrases hidden by default with copy and native Markdown export. Portable static apps use isolated per-app origins with no owner credential access. This release passed installed Linux and Windows startup acceptance; Media background playback and cross-device library synchronization are not claimed.
