@@ -75,7 +75,6 @@ jobs:
           mkdir release
           cp "$(find artifacts -name '*.AppImage' | head -1)" release/Delta-Desktop-linux-x86_64.AppImage
           cp "$(find artifacts -name '*-setup.exe' | head -1)" release/Delta-Desktop-windows-x86_64.exe
-          cp install.sh install.ps1 release/
           cd release && sha256sum * > SHA256SUMS
       - env:
           GH_TOKEN: ${{ github.token }}

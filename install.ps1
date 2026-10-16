@@ -1,5 +1,11 @@
 $ErrorActionPreference = 'Stop'
-$Version = '0.1.1'
+$Version = $env:DELTA_DESKTOP_VERSION
+if (-not $Version) {
+  $Release = Invoke-RestMethod 'https://api.github.com/repos/n-ycta/delta-desktop/releases/latest'
+  $Version = $Release.tag_name
+}
+$Version = ([string]$Version) -replace '^v', ''
+if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw 'Cannot resolve a stable Desktop release' }
 if (-not [Environment]::Is64BitOperatingSystem) { throw 'Windows x64 required' }
 $Base = "https://github.com/n-ycta/delta-desktop/releases/download/v$Version"
 $Temp = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString())

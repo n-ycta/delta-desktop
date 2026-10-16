@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
-VERSION=0.1.1
+VERSION=${DELTA_DESKTOP_VERSION:-}
+if [ -z "$VERSION" ]; then
+  VERSION=$(curl -fsSL --proto '=https' --tlsv1.2 https://api.github.com/repos/n-ycta/delta-desktop/releases/latest | sed -n 's/.*"tag_name": *"v\([0-9][0-9.]*\)".*/\1/p')
+fi
+VERSION=${VERSION#v}
+printf '%s\n' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo 'Cannot resolve a stable Desktop release' >&2; exit 1; }
 [ "$(uname -s)" = Linux ] && [ "$(uname -m)" = x86_64 ] || { echo 'Linux x86_64 required' >&2; exit 1; }
 command -v curl >/dev/null; command -v sha256sum >/dev/null
 base="https://github.com/n-ycta/delta-desktop/releases/download/v$VERSION"

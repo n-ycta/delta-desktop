@@ -6,7 +6,7 @@ Native Windows x64 and Linux x86_64 clients with embedded Rust Core, a shared im
 - Persistent node identity, dashboards and preferences.
 - Independent headless MCP/updater/provisioning/observability plugins remain optional and capability-gated.
 
-Download the AppImage or per-user NSIS EXE and verify SHA256SUMS. Linux and Windows install scripts are included. The Windows EXE is not Authenticode-signed and may trigger SmartScreen. AppImage requires FUSE 2 or APPIMAGE_EXTRACT_AND_RUN=1.
+Download the AppImage or per-user NSIS EXE and verify SHA256SUMS. One-command latest-release installation for Linux and Windows is documented in the repository README; installers are hosted in the repository rather than required as release attachments. The Windows EXE is not Authenticode-signed and may trigger SmartScreen. AppImage requires FUSE 2 or APPIMAGE_EXTRACT_AND_RUN=1.
 
 Release gates include native startup, profile persistence, private runtime and installing/running headless MCP without Web on CI. Shared UI routes are also exercised against a real embedded Core through a browser harness. CI is not a physical-device test.
 
