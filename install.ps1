@@ -7,7 +7,9 @@ New-Item -ItemType Directory -Path $Temp | Out-Null
 try {
   $Exe = Join-Path $Temp 'Delta-Desktop-windows-x86_64.exe'
   Invoke-WebRequest "$Base/Delta-Desktop-windows-x86_64.exe" -OutFile $Exe
-  $Checks = (Invoke-WebRequest "$Base/SHA256SUMS").Content
+  $ChecksPath = Join-Path $Temp 'SHA256SUMS'
+  Invoke-WebRequest "$Base/SHA256SUMS" -OutFile $ChecksPath
+  $Checks = Get-Content $ChecksPath -Raw -Encoding UTF8
   $Line = ($Checks -split "`n" | Where-Object { $_ -match '  Delta-Desktop-windows-x86_64.exe\s*$' })
   if (-not $Line -or ($Line.Trim() -split '\s+')[0] -ne (Get-FileHash $Exe -Algorithm SHA256).Hash.ToLowerInvariant()) { throw 'Checksum mismatch' }
   Write-Warning 'This release is not Authenticode-signed. Windows may show SmartScreen. Verify the source and checksum before proceeding.'
